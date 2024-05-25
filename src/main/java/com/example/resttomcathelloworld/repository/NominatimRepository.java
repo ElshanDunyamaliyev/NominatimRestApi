@@ -6,6 +6,7 @@ import com.example.resttomcathelloworld.entity.SearchResponse;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.core.Response;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +18,16 @@ import java.util.List;
 public class NominatimRepository {
 
     Connection connection = DbConnection.getConnection();
+
+    public void deleteTable(){
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS searchResponse");
+            preparedStatement.executeUpdate();
+            System.out.println("Table deleted successfully");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void createTable() {
         try {
@@ -30,6 +41,7 @@ public class NominatimRepository {
                     "                            longitude DOUBLE PRECISION NOT NULL)"
             );
             preparedStatement.execute();
+            System.out.println("Table created successfully");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -29,7 +29,8 @@ public class  NominatimService {
         var response = executeRequest(uri);
         String jsonArray = response.readEntity(String.class);
         SearchResponse[] searchResponseArray = ParseUtils.parseJsonArray(jsonArray,SearchResponse[].class);
-        nominatimRepository.createTable();
+//        nominatimRepository.deleteTable();
+//        nominatimRepository.createTable();
         for(var el : searchResponseArray){
             el.setQuery(query);
             nominatimRepository.insertSearchResponse(query,el);

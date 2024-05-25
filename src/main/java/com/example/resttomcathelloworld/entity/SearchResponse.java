@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
