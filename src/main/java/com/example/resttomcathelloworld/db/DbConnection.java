@@ -1,7 +1,5 @@
-package com.example.resttomcathelloworld;
+package com.example.resttomcathelloworld.db;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -17,9 +15,6 @@ public class DbConnection {
             throw new RuntimeException(e);
         }
         try {
-            System.out.println(new File("").getPath());
-            System.out.println(new File("").getAbsolutePath());
-            System.out.println("Current working directory: " + System.getProperty("user.dir"));
             connection = DriverManager.getConnection ("jdbc:sqlite:nominatim.db");
             System.out.println("Database connection successfully");
         } catch (SQLException e) {

@@ -21,14 +21,14 @@ public class NominatimResource {
     @GET()
     @Path("/search")
     @Produces("application/json")
-    public String search(@DefaultValue("baki") @QueryParam("q") String query) {
+    public Response search(@DefaultValue("baki") @QueryParam("q") String query) {
         return searchService.search(query);
     }
 
     @GET()
     @Path("/reverse")
     @Produces("application/json")
-    public String reverse(@DefaultValue("40.3755885") @QueryParam("lat") double lat,@DefaultValue("49.8328009") @QueryParam("lon") double lon) {
+    public Response reverse(@DefaultValue("40.3755885") @QueryParam("lat") double lat,@DefaultValue("49.8328009") @QueryParam("lon") double lon) {
         return searchService.reverse(lat,lon);
     }
 }

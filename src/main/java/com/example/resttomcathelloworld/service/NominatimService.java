@@ -2,9 +2,7 @@ package com.example.resttomcathelloworld.service;
 
 import com.example.resttomcathelloworld.entity.SearchResponse;
 import com.example.resttomcathelloworld.repository.NominatimRepository;
-import com.example.resttomcathelloworld.util.ParseUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.resttomcathelloworld.utils.ParseUtils;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Client;
@@ -24,32 +22,41 @@ public class  NominatimService {
     @Inject
     NominatimRepository nominatimRepository;
 
-    public String search(String query){
+    public Response search(String query){
         WebTarget uri = client.target(BASE_URL + "/search").queryParam("q",query);
-        var response = executeRequest(uri);
-        String jsonArray = response.readEntity(String.class);
-        SearchResponse[] searchResponseArray = ParseUtils.parseJsonArray(jsonArray,SearchResponse[].class);
-//        nominatimRepository.deleteTable();
-//        nominatimRepository.createTable();
-        for(var el : searchResponseArray){
-            el.setQuery(query);
-            nominatimRepository.insertSearchResponse(query,el);
-        }
-        System.out.println(nominatimRepository.getAllData());
-        return response.toString();
+        writeToDb(uri,query);
+        return executeRequest(uri);
     }
 
-    public String reverse(double lat, double lon){
+    public Response reverse(double lat, double lon){
         WebTarget uri = client.target(BASE_URL + "/reverse").
                 queryParam("lat",lat).
                 queryParam("lon",lon).
                 queryParam("format","jsonv2");
+        String query = uri.toString().substring(uri.toString().indexOf("?") + 1,uri.toString().indexOf("&format"));
+        writeToDb(uri,query);
+        return executeRequest(uri);
+    }
 
-        return executeRequest(uri).toString();
+    private void writeToDb(WebTarget uri, String query){
+        nominatimRepository.createTable();
+        Response response = executeRequest(uri);
+        String jsonArray = response.readEntity(String.class);
+        if(uri.toString().contains("search")){
+            SearchResponse[] searchResponseArray = ParseUtils.parseJsonArray(jsonArray,SearchResponse[].class);
+            for(var el : searchResponseArray){
+                el.setQuery(query);
+                nominatimRepository.insertSearchResponse(query,el);
+            }
+        }
+        if(uri.toString().contains("reverse")){
+            SearchResponse searchResponse = ParseUtils.parseJsonObject(jsonArray,SearchResponse.class);
+            searchResponse.setQuery(query);
+            nominatimRepository.insertSearchResponse(query,searchResponse);
+        }
     }
 
     private Response executeRequest(WebTarget uri){
-        Response response = uri.request(MediaType.WILDCARD_TYPE).get();
-        return response;
+        return uri.request(MediaType.WILDCARD_TYPE).get();
     }
 }

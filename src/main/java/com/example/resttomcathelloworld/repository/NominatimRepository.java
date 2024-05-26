@@ -1,12 +1,11 @@
 package com.example.resttomcathelloworld.repository;
 
 
-import com.example.resttomcathelloworld.DbConnection;
+import com.example.resttomcathelloworld.db.DbConnection;
 import com.example.resttomcathelloworld.entity.SearchResponse;
+import com.example.resttomcathelloworld.enums.Queries;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.ws.rs.core.Response;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,27 +18,10 @@ public class NominatimRepository {
 
     Connection connection = DbConnection.getConnection();
 
-    public void deleteTable(){
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS searchResponse");
-            preparedStatement.executeUpdate();
-            System.out.println("Table deleted successfully");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void createTable() {
+        String createTableQuery = Queries.CREATE_TABLE.getQuery();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE if not exists searchResponse(" +
-                    "                            placeId INTEGER NOT NULL," +
-                    "                            displayName VARCHAR(500) NOT NULL," +
-                    "                            type VARCHAR(30) NOT NULL," +
-                    "                            category VARCHAR(30) NOT NULL," +
-                    "                            query VARCHAR(30) NOT NULL," +
-                    "                            latitude DOUBLE PRECISION NOT NULL," +
-                    "                            longitude DOUBLE PRECISION NOT NULL)"
-            );
+            PreparedStatement preparedStatement = connection.prepareStatement(createTableQuery);
             preparedStatement.execute();
             System.out.println("Table created successfully");
         } catch (SQLException e) {
@@ -48,10 +30,10 @@ public class NominatimRepository {
     }
 
     public void insertSearchResponse(String query, SearchResponse response) {
+        String insertResponseQuery = Queries.INSERT_RESPONSE.getQuery();
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("insert into searchResponse(placeId,displayName,type,category," +
-                            "query,latitude,longitude) values(?,?,?,?,?,?,?)");
+            PreparedStatement preparedStatement = connection.prepareStatement(insertResponseQuery);
 
             preparedStatement.setInt(1, response.getPlaceId());
             preparedStatement.setString(2, response.getDisplayName());
@@ -67,11 +49,11 @@ public class NominatimRepository {
     }
 
     public List<SearchResponse> getAllData(){
+        String getAllResponsesQuery = Queries.GET_ALL_RESPONSES.getQuery();
         List<SearchResponse> searchResponses = new ArrayList<>();
-
         try {
             PreparedStatement preparedStatement = connection.
-                    prepareStatement("select * from searchResponse");
+                    prepareStatement(getAllResponsesQuery);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
                 SearchResponse searchResponse = new SearchResponse();
@@ -86,6 +68,17 @@ public class NominatimRepository {
                 searchResponses.add(searchResponse);
             }
             return searchResponses;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteTable(){
+        String deleteTableQuery = Queries.DELETE_TABLE.getQuery();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteTableQuery);
+            preparedStatement.executeUpdate();
+            System.out.println("Table deleted successfully");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
