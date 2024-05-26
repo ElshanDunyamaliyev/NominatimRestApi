@@ -10,14 +10,13 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @RequestScoped
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SearchResponse implements Serializable {
+public class ApiResponse implements Serializable {
     @Id
     @JsonProperty("place_id")
     Integer placeId;

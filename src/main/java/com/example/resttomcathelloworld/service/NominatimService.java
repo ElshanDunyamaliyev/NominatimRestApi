@@ -1,8 +1,6 @@
 package com.example.resttomcathelloworld.service;
 
-import com.example.resttomcathelloworld.entity.SearchResponse;
-import com.example.resttomcathelloworld.repository.NominatimRepository;
-import com.example.resttomcathelloworld.utils.ParseUtils;
+import com.example.resttomcathelloworld.db.DbInsertion;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Client;
@@ -20,11 +18,12 @@ public class  NominatimService {
     private final Client client = ClientBuilder.newClient();
 
     @Inject
-    NominatimRepository nominatimRepository;
+    DbInsertion dbInsertion;
 
     public Response search(String query){
         WebTarget uri = client.target(BASE_URL + "/search").queryParam("q",query);
-        writeToDb(uri,query);
+        Response response = executeRequest(uri);
+        dbInsertion.insertDb(uri,query,response);
         return executeRequest(uri);
     }
 
@@ -34,26 +33,9 @@ public class  NominatimService {
                 queryParam("lon",lon).
                 queryParam("format","jsonv2");
         String query = uri.toString().substring(uri.toString().indexOf("?") + 1,uri.toString().indexOf("&format"));
-        writeToDb(uri,query);
-        return executeRequest(uri);
-    }
-
-    private void writeToDb(WebTarget uri, String query){
-        nominatimRepository.createTable();
         Response response = executeRequest(uri);
-        String jsonArray = response.readEntity(String.class);
-        if(uri.toString().contains("search")){
-            SearchResponse[] searchResponseArray = ParseUtils.parseJsonArray(jsonArray,SearchResponse[].class);
-            for(var el : searchResponseArray){
-                el.setQuery(query);
-                nominatimRepository.insertSearchResponse(query,el);
-            }
-        }
-        if(uri.toString().contains("reverse")){
-            SearchResponse searchResponse = ParseUtils.parseJsonObject(jsonArray,SearchResponse.class);
-            searchResponse.setQuery(query);
-            nominatimRepository.insertSearchResponse(query,searchResponse);
-        }
+        dbInsertion.insertDb(uri,query,response);
+        return executeRequest(uri);
     }
 
     private Response executeRequest(WebTarget uri){

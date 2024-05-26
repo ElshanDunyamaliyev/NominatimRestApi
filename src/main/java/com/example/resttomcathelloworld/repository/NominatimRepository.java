@@ -2,7 +2,7 @@ package com.example.resttomcathelloworld.repository;
 
 
 import com.example.resttomcathelloworld.db.DbConnection;
-import com.example.resttomcathelloworld.entity.SearchResponse;
+import com.example.resttomcathelloworld.entity.ApiResponse;
 import com.example.resttomcathelloworld.enums.Queries;
 import jakarta.enterprise.context.RequestScoped;
 
@@ -29,7 +29,7 @@ public class NominatimRepository {
         }
     }
 
-    public void insertSearchResponse(String query, SearchResponse response) {
+    public void insertSearchResponse(String query, ApiResponse response) {
         String insertResponseQuery = Queries.INSERT_RESPONSE.getQuery();
         try {
 
@@ -48,15 +48,15 @@ public class NominatimRepository {
         }
     }
 
-    public List<SearchResponse> getAllData(){
+    public List<ApiResponse> getAllData(){
         String getAllResponsesQuery = Queries.GET_ALL_RESPONSES.getQuery();
-        List<SearchResponse> searchResponses = new ArrayList<>();
+        List<ApiResponse> searchResponses = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.
                     prepareStatement(getAllResponsesQuery);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
-                SearchResponse searchResponse = new SearchResponse();
+                ApiResponse searchResponse = new ApiResponse();
                 searchResponse.setPlaceId(resultSet.getInt("placeId"));
                 searchResponse.setLatitude(resultSet.getDouble("latitude"));
                 searchResponse.setLongitude(resultSet.getDouble("longitude"));

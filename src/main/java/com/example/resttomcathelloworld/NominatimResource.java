@@ -1,15 +1,8 @@
 package com.example.resttomcathelloworld;
 
-import com.example.resttomcathelloworld.entity.SearchResponse;
 import com.example.resttomcathelloworld.service.NominatimService;
 import jakarta.inject.Inject;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/")
